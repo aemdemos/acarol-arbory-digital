@@ -1,10 +1,10 @@
 export default function parse(element, { document }) {
   // Extract relevant content dynamically from the input element
   const phoneIconWrapper = element.querySelector(
-    '.elementor-icon-wrapper .elementor-icon'
+    '.elementor-icon-wrapper .elementor-icon',
   );
   const phoneNumberWrapper = element.querySelector(
-    '.elementor-heading-title a'
+    '.elementor-heading-title a',
   );
 
   // Handle edge cases: If elements are missing, log a warning and return

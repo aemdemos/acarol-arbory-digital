@@ -14,7 +14,7 @@ export default function parse(element, { document }) {
   }
 
   // Extract buttons dynamically
-  const buttons = Array.from(element.querySelectorAll('.elementor-widget-button a')).map(button => {
+  const buttons = Array.from(element.querySelectorAll('.elementor-widget-button a')).map((button) => {
     const link = document.createElement('a');
     link.href = button.href;
     link.textContent = button.querySelector('.elementor-button-text').textContent;
@@ -27,7 +27,7 @@ export default function parse(element, { document }) {
 
   // Create the content row dynamically with proper filtering of valid elements
   const contentRow = [
-    [title, description, ...buttons].filter(Boolean) // Ensure only valid elements exist
+    [title, description, ...buttons].filter(Boolean), // Ensure only valid elements exist
   ];
 
   // Use the helper function to create the block table

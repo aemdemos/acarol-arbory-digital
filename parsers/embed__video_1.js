@@ -17,7 +17,7 @@ export default function parse(element, { document }) {
   // Create the table structure with the corrected header row and content row
   const cells = [
     headerRow,
-    contentRow
+    contentRow,
   ];
 
   // Create the block table using WebImporter.DOMUtils.createTable()

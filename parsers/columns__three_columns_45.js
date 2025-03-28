@@ -15,7 +15,7 @@ export default function parse(element, { document }) {
   // Create table rows
   const rows = [
     headerRow,
-    [column1Content, column2Content]
+    [column1Content, column2Content],
   ];
 
   // Build table using WebImporter.DOMUtils.createTable

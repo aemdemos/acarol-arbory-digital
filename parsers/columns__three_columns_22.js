@@ -61,7 +61,7 @@ export default function parse(element, { document }) {
   // Create table data
   const tableData = [
     headerRow,
-    columns
+    columns,
   ];
 
   // Replace original element with the table

@@ -53,8 +53,8 @@ export default function parse(element, { document }) {
           contentWrapper.appendChild(buttonElement);
         }
         return contentWrapper;
-      })()
-    ]
+      })(),
+    ],
   ];
 
   // Create the table block

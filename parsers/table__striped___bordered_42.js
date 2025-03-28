@@ -8,7 +8,7 @@ export default function parse(element, { document }) {
   const headerRow = [headerCell];
 
   // Extract rows of data dynamically
-  const rows = slides.map(slide => {
+  const rows = slides.map((slide) => {
     const title = slide.getAttribute('data-elementor-lightbox-title');
     const url = slide.href;
 

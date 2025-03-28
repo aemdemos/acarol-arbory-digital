@@ -47,7 +47,7 @@ export default function parse(element, { document }) {
 
   const cells = [
     headerRow,
-    [contentCell]
+    [contentCell],
   ];
   const blockTable = WebImporter.DOMUtils.createTable(cells, document);
 

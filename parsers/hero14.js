@@ -1,5 +1,5 @@
 export default function parse(element, { document }) {
-  const createTable = WebImporter.DOMUtils.createTable;
+  const { createTable } = WebImporter.DOMUtils;
 
   // Create the header row with exact text
   const headerCell = document.createElement('strong');

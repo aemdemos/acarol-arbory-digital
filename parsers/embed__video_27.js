@@ -8,7 +8,7 @@ export default function parse(element, { document }) {
 
   // Extract social icons
   const socialWrapper = element.querySelector('.elementor-social-icons-wrapper');
-  const socialLinks = socialWrapper ? Array.from(socialWrapper.querySelectorAll('a')).map(link => {
+  const socialLinks = socialWrapper ? Array.from(socialWrapper.querySelectorAll('a')).map((link) => {
     const platform = link.querySelector('span.elementor-screen-only')?.textContent.trim();
     const href = link.getAttribute('href');
     return { platform, href };
@@ -19,7 +19,7 @@ export default function parse(element, { document }) {
   headerRow[0].textContent = headingText || 'Social Links';
 
   // Create content rows dynamically based on extracted links
-  const contentRows = socialLinks.map(link => {
+  const contentRows = socialLinks.map((link) => {
     const cellContent = document.createElement('div');
     const platformSpan = document.createElement('span');
     platformSpan.textContent = link.platform || 'Unknown Platform';

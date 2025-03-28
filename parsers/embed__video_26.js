@@ -1,5 +1,5 @@
 export default function parse(element, { document }) {
-  const createTable = WebImporter.DOMUtils.createTable;
+  const { createTable } = WebImporter.DOMUtils;
 
   // Extract content relevant for the block
   const logo = element.querySelector('img');

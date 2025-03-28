@@ -42,7 +42,7 @@ export default function parse(element, { document }) {
   // Create the table block
   const cells = [
     headerRow,
-    content.length > 0 ? [content] : []
+    content.length > 0 ? [content] : [],
   ];
 
   const block = WebImporter.DOMUtils.createTable(cells, document);

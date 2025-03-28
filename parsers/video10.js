@@ -26,14 +26,14 @@ export default function parse(element, { document }) {
     [
       imageElement || document.createTextNode('No image available'),
       document.createElement('br'),
-      document.createTextNode(videoSource)
-    ]
+      document.createTextNode(videoSource),
+    ],
   ];
 
   // Structure the table data
   const tableData = [
     headerRow,
-    contentRow
+    contentRow,
   ];
 
   // Create the table block using the helper function
