@@ -9,8 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-/* global document,WebImporter */
-
+/* global WebImporter */
+/* eslint-disable no-console */
 const brandLogoMapping = [
   {
     checkFn: (e) => [...e.querySelectorAll('a > picture, a > img')].filter((i) => i.closest('[data-hlx-imp-hidden-div]') === null)[0],

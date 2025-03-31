@@ -2,6 +2,7 @@
  * The import rules object defines elements that can be removed (cleanup) from the source
  * document and elements that should be transformed into blocks.
  */
+/* eslint-disable comma-dangle */
 const importRules = {
   cleanup: {
     start: [],
