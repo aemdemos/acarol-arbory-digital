@@ -1,40 +1,33 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-    // Helper function to wrap text in an HTML tag
-    const wrapInTag = (text, tagName = 'p') => {
-        const tag = document.createElement(tagName);
-        tag.textContent = text;
-        return tag;
-    };
+  // Extract the columns from the section
+  const columns = Array.from(element.querySelectorAll('.elementor-column'));
 
-    // Extract content from the columns
-    const column1 = element.querySelector('.elementor-element-4568ce0');
-    const column2 = element.querySelector('.elementor-element-1556797');
+  // Build a header row for the block
+  const headerRow = ['Columns'];
 
-    const extractContent = (columnElement) => {
-        if (!columnElement) return [];
-        return Array.from(columnElement.querySelectorAll('li')).map((li) => {
-            const paragraph = li.querySelector('p');
-            return paragraph ? wrapInTag(paragraph.textContent) : wrapInTag(li.textContent);
-        });
-    };
+  // Collect content from each column
+  const contentCells = columns.map((column) => {
+    const items = Array.from(column.querySelectorAll('ul li')).map((li) => {
+      const itemContent = li.querySelector('p') ? li.querySelector('p').innerHTML : li.innerHTML;
+      const div = document.createElement('div');
+      div.innerHTML = itemContent.trim();
+      return div;
+    });
+    const wrapperDiv = document.createElement('div');
+    items.forEach((item) => wrapperDiv.appendChild(item));
+    return wrapperDiv;
+  });
 
-    const contentColumn1 = extractContent(column1);
-    const contentColumn2 = extractContent(column2);
+  // Create a table array for the block
+  const tableArray = [
+    headerRow,
+    contentCells,
+  ];
 
-    // Create header row
-    const headerRow = ['Columns']; // Matches the example exactly
+  // Create the block table
+  const blockTable = WebImporter.DOMUtils.createTable(tableArray, document);
 
-    // Combine the extracted contents into structured rows as specified in the example
-    const cells = [
-        headerRow,
-        [contentColumn1[0], contentColumn2[0]],
-        [contentColumn1[1], contentColumn2[1]],
-        [contentColumn1[2], contentColumn2[2]],
-        [contentColumn1[3], contentColumn2[3]],
-        [contentColumn1[4], contentColumn2[4]],
-    ];
-
-    // Replace the original element with the new structured block table
-    const blockTable = WebImporter.DOMUtils.createTable(cells, document);
-    element.replaceWith(blockTable);
+  // Replace the original element with the block table
+  element.replaceWith(blockTable);
 }

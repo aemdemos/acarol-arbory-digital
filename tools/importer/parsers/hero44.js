@@ -1,69 +1,48 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  // Helper method to extract text content from an element
-  const getTextContent = (selector) => {
-    const el = element.querySelector(selector);
-    return el ? el.textContent.trim() : '';
-  };
+  const headerRow = ['Hero'];
 
-  // Helper method to extract href link from button
-  const getButtonLink = (selector) => {
-    const button = element.querySelector(selector);
-    return button ? button.href : '';
-  };
+  // Extract the content from the element
+  const heading = element.querySelector('.elementor-heading-title');
+  const description = element.querySelector('.elementor-widget-text-editor p');
+  const buttons = Array.from(element.querySelectorAll('.elementor-button-wrapper a')).map((button) => {
+    const buttonText = button.querySelector('.elementor-button-text')?.textContent.trim() || '';
+    const buttonLink = button.getAttribute('href') || '';
+    const link = document.createElement('a');
+    link.href = buttonLink;
+    link.textContent = buttonText;
+    return link;
+  });
 
-  // Helper method to create an HTML CTA element
-  const createCTAElement = (text, url) => {
-    if (text && url) {
-      const link = document.createElement('a');
-      link.href = url;
-      link.textContent = text;
-      return link;
-    }
-    return null;
-  };
+  // Create content cell combining all the elements
+  const contentCell = [];
 
-  // Extract required information from the element
-  const title = getTextContent('.elementor-widget-heading h1');
-  const description = getTextContent('.elementor-widget-text-editor p');
-  const contactUsLink = getButtonLink('a.elementor-button[href*="contactus"]');
-  const whatWeDoLink = getButtonLink('a.elementor-button[href*="about-arbory-digital"]');
-
-  // Create CTA elements dynamically
-  const contactUsCTA = contactUsLink ? createCTAElement('Contact us', contactUsLink) : null;
-  const whatWeDoCTA = whatWeDoLink ? createCTAElement('What we do', whatWeDoLink) : null;
-
-  // Create content cell with extracted and constructed content
-  const contentCell = document.createElement('div');
-
-  if (title) {
-    const titleElement = document.createElement('h1');
-    titleElement.textContent = title;
-    contentCell.appendChild(titleElement);
+  // Add heading
+  if (heading) {
+    const headingElement = document.createElement('h1');
+    headingElement.textContent = heading.textContent.trim();
+    contentCell.push(headingElement);
   }
 
+  // Add description
   if (description) {
     const descriptionElement = document.createElement('p');
-    descriptionElement.textContent = description;
-    contentCell.appendChild(descriptionElement);
+    descriptionElement.textContent = description.textContent.trim();
+    contentCell.push(descriptionElement);
   }
 
-  if (contactUsCTA) {
-    contentCell.appendChild(contactUsCTA);
+  // Add buttons
+  if (buttons.length > 0) {
+    contentCell.push(...buttons);
   }
 
-  if (whatWeDoCTA) {
-    contentCell.appendChild(whatWeDoCTA);
-  }
-
-  // Create table structure
+  // Create the table
   const cells = [
-    ['Hero'], // Header row matches the example EXACTLY
-    [contentCell],
+    headerRow,
+    [contentCell]
   ];
+  const block = WebImporter.DOMUtils.createTable(cells, document);
 
-  // Create table block
-  const table = WebImporter.DOMUtils.createTable(cells, document);
-
-  // Replace the original element with the table block
-  element.replaceWith(table);
+  // Replace the original element with the new block table
+  element.replaceWith(block);
 }

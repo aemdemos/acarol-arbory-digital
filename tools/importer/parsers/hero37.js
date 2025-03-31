@@ -1,31 +1,38 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  // Create header row with proper formatting dynamically
-  const headerCell = document.createElement('strong');
-  headerCell.textContent = 'Hero';
-  const headerRow = [headerCell];
+  // Validate the element exists
+  if (!element) return;
 
-  // Extract image dynamically from the element
-  const imgElement = element.querySelector('img');
-  const image = document.createElement('img');
-  if (imgElement) {
-    image.src = imgElement.getAttribute('data-lazy-src') || imgElement.src; // Handle fallback to 'src' in case 'data-lazy-src' is missing
-    image.alt = imgElement.alt || ''; // Handle missing 'alt' attribute
+  // Extract the image source dynamically
+  const img = element.querySelector('img');
+  const imgSrc = img ? img.getAttribute('data-lazy-src') || img.getAttribute('src') : '';
+
+  // Create the image element dynamically
+  const imageElement = document.createElement('img');
+  if (imgSrc) {
+    imageElement.src = imgSrc;
+  } else {
+    // Handle edge case: Missing image source
+    imageElement.alt = 'Image not available';
   }
 
-  // Extract dynamically the heading, ensuring no assumptions are hard-coded
-  const headingContent = imgElement ? imgElement.alt : 'Heading in Block';
-  const heading = document.createElement('h1');
-  heading.textContent = headingContent;
+  // Extract header dynamically if available
+  const titleText = img ? img.alt : 'Default Heading'; // Use the alt text or fallback if no alt text
+  const titleElement = document.createElement('h1');
+  titleElement.textContent = titleText;
 
-  // Assemble table rows, ensuring no empty cells are created
-  const cells = [
+  // Construct the header row dynamically
+  const headerRow = ['Hero'];
+
+  // Structure the table data dynamically
+  const tableData = [
     headerRow,
-    [image, heading],
+    [imageElement, titleElement],
   ];
 
-  // Create table using WebImporter.DOMUtils.createTable
-  const block = WebImporter.DOMUtils.createTable(cells, document);
+  // Use createTable to create the structured table
+  const table = WebImporter.DOMUtils.createTable(tableData, document);
 
-  // Replace original element with created block table
-  element.replaceWith(block);
+  // Replace the original element with the new table dynamically
+  element.replaceWith(table);
 }

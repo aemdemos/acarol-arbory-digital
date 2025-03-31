@@ -1,29 +1,30 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  // Extract the video URL dynamically from the provided HTML
-  const videoElement = element.querySelector('video');
-  const videoURL = videoElement?.getAttribute('src');
+  // Extract the video URL
+  const videoElement = element.querySelector('.elementor-background-video-hosted');
+  const videoUrl = videoElement?.getAttribute('src') || '';
 
-  if (!videoURL) {
-    console.warn('Video element missing or invalid URL');
-    return;
-  }
-
+  // Prepare the header row and content row
   const headerRow = ['Embed'];
 
-  // Create the video link row dynamically
-  const contentRow = [document.createElement('a')];
-  const linkElement = contentRow[0];
-  linkElement.setAttribute('href', videoURL);
-  linkElement.textContent = videoURL;
+  const contentRow = [];
 
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', videoUrl);
+  linkElement.textContent = videoUrl;
+
+  if (videoUrl) {
+    contentRow.push(linkElement);
+  }
+
+  // Create the table block
   const cells = [
-    headerRow, // Block header row identical to the example
-    contentRow // Content row dynamically constructed with the video URL link
+    headerRow,
+    contentRow
   ];
 
-  // Dynamically create the block table using the provided helper function
   const blockTable = WebImporter.DOMUtils.createTable(cells, document);
 
-  // Replace the original element with the newly generated block table
+  // Replace the original element with the new table
   element.replaceWith(blockTable);
 }

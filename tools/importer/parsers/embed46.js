@@ -1,40 +1,35 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  // Create header row and ensure proper formatting
-  const headerCell = document.createElement('strong');
-  headerCell.textContent = 'Embed';
-  const headerRow = [headerCell];
+  // Define the block name header for the table
+  const blockName = 'Embed';
 
-  // Dynamically extract image content
-  const imageDiv = element.querySelector('.jet-parallax-section__image');
-  const imageElement = document.createElement('img');
-  if (imageDiv) {
-    const backgroundImage = imageDiv.style.backgroundImage;
-    if (backgroundImage) {
-      const imageUrlMatch = backgroundImage.match(/url\(['"]?([^'"]*)['"]?\)/);
-      if (imageUrlMatch && imageUrlMatch[1]) {
-        imageElement.src = imageUrlMatch[1];
-      }
-    }
-  }
-  imageElement.alt = 'Video thumbnail';
+  // Ensure the header row matches the example precisely
+  const headerRow = [blockName];
 
-  // Dynamically extract video link
-  const linkElement = element.querySelector('a[href*="vimeo.com"]');
-  const videoLink = document.createElement('a');
-  if (linkElement && linkElement.href) {
-    videoLink.href = linkElement.href;
-    videoLink.textContent = linkElement.href;
+  // Dynamically extract the target elements from the HTML structure
+  const iconWrapper = element.querySelector('.elementor-icon-wrapper a');
+  const headingTitle = element.querySelector('.elementor-heading-title a');
+
+  // Check and handle possible missing or empty content
+  const phoneLink = iconWrapper ? iconWrapper.href : ''; // Extract href for link
+  const phoneText = headingTitle ? headingTitle.textContent.trim() : ''; // Extract text within <a>
+
+  // Create the single content cell with the extracted link and text
+  const contentCell = document.createElement('div');
+  if (phoneLink) {
+    const anchor = document.createElement('a');
+    anchor.href = phoneLink; // Set link URL dynamically
+    anchor.textContent = phoneText || phoneLink; // Use extracted text or fallback to href
+    contentCell.appendChild(anchor); // Append anchor to content cell
   }
 
-  // Create table rows
-  const cells = [
-    headerRow, // Header row with correct formatting
-    [imageElement, videoLink], // Content row with extracted elements
-  ];
+  // Prepare data rows for the block table
+  const contentRow = [contentCell];
 
-  // Create block table using helper function
-  const block = WebImporter.DOMUtils.createTable(cells, document);
+  // Utilize WebImporter to structure table
+  const cells = [headerRow, contentRow];
+  const blockTable = WebImporter.DOMUtils.createTable(cells, document);
 
-  // Replace original element with new table
-  element.replaceWith(block);
+  // Replace the original element with the new structured table
+  element.replaceWith(blockTable);
 }

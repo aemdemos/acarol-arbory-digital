@@ -1,46 +1,41 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  // Find elements within the given element
-  const imageContainer = element.querySelector('.elementor-widget-image img');
-  const titleContainer = element.querySelector('.elementor-widget-heading .elementor-heading-title');
-  const subtitleContainers = element.querySelectorAll('.elementor-widget-heading .elementor-heading-title');
+  // Extract content dynamically
+  const imageEl = element.querySelector('img');
+  const titleEl = element.querySelector('.elementor-column .elementor-element-adce6a5 .elementor-widget-container .elementor-heading-title');
+  const subheadingEl = element.querySelector('.elementor-column .elementor-element-3b24faa .elementor-widget-container h3');
 
-  // Verify that required containers exist
-  if (!imageContainer || !titleContainer) {
-    console.warn('Required elements not found');
-    return;
+  // Create content pieces dynamically, with safeguards
+  let contentArray = [];
+
+  if (imageEl) {
+    const image = document.createElement('img');
+    image.src = imageEl.src;
+    image.alt = imageEl.alt || '';
+    contentArray.push(image);
   }
 
-  // Extract image attributes dynamically
-  const image = document.createElement('img');
-  image.src = imageContainer.getAttribute('src');
-  image.alt = imageContainer.getAttribute('alt') || '';
-
-  // Extract title using its text content
-  const title = document.createElement('h1');
-  title.textContent = titleContainer.textContent.trim();
-
-  // Check for subtitle and extract its text content dynamically
-  let subtitle = null;
-  if (subtitleContainers.length > 1) {
-    const subtitleContainer = subtitleContainers[1];
-    subtitle = document.createElement('h2');
-    subtitle.textContent = subtitleContainer.textContent.trim();
+  if (titleEl) {
+    const title = document.createElement('h1');
+    title.textContent = titleEl.textContent.trim();
+    contentArray.push(title);
   }
 
-  // Construct table rows dynamically, ensuring matching structure
-  const headerCell = document.createElement('strong');
-  headerCell.textContent = 'Hero'; // Header row matches example exactly
-  const headerRow = [headerCell];
+  if (subheadingEl) {
+    const subheading = document.createElement('h3');
+    subheading.textContent = subheadingEl.textContent.trim();
+    contentArray.push(subheading);
+  }
 
-  const contentRow = subtitle ? [image, title, subtitle] : [image, title]; // Content row conditions based on data
-
+  // Build table structure
   const cells = [
-    headerRow, // Header row
-    contentRow, // Content row
+    ['Hero'], // Header row exactly matches example -- one column with block name 'Hero'
+    [contentArray], // Combine all content into a single cell in the second row
   ];
 
+  // Create replacement block table
   const table = WebImporter.DOMUtils.createTable(cells, document);
 
-  // Replace the original element
+  // Replace original element with the new block table
   element.replaceWith(table);
 }

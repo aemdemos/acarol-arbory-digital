@@ -1,43 +1,39 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  const cards = [];
-
-  // Header row for the block
   const headerRow = ['Cards'];
-  cards.push(headerRow);
 
-  // Extract card data
-  const items = element.querySelectorAll('.jet-hor-timeline-item');
-  items.forEach((item) => {
-    const imgElement = item.querySelector('.jet-hor-timeline-item__card-img img');
-    const titleElement = item.querySelector('.jet-hor-timeline-item__card-title');
-    const descElement = item.querySelector('.jet-hor-timeline-item__card-desc');
-
-    // Ensure valid image element
-    let img = null;
-    if (imgElement) {
-      img = document.createElement('img');
-      img.src = imgElement.getAttribute('data-lazy-src') || imgElement.src;
-      img.alt = imgElement.alt || '';
+  // Helper function to extract card details
+  const extractCardData = (cardElement) => {
+    const imageElement = cardElement.querySelector('.jet-hor-timeline-item__card-img img');
+    const image = imageElement && document.createElement('img');
+    if (image) {
+      image.src = imageElement.src;
+      image.alt = imageElement.alt;
+      image.title = imageElement.title;
     }
 
-    // Content: Ensure valid title and description elements
-    const content = [];
-    if (titleElement && titleElement.textContent.trim()) {
-      const title = document.createElement('p');
-      title.innerHTML = `<strong>${titleElement.textContent.trim()}</strong>`;
-      content.push(title);
-    }
-    if (descElement && descElement.textContent.trim()) {
-      const description = document.createElement('p');
-      description.innerHTML = descElement.innerHTML.trim();
-      content.push(description);
+    const titleElement = cardElement.querySelector('.jet-hor-timeline-item__card-title');
+    const title = titleElement && document.createElement('h5');
+    if (title) {
+      title.textContent = titleElement.textContent;
     }
 
-    // Add row to cards
-    cards.push([img, content]);
-  });
+    const descElement = cardElement.querySelector('.jet-hor-timeline-item__card-desc');
+    const description = descElement && document.createElement('p');
+    if (description) {
+      description.innerHTML = descElement.innerHTML;
+    }
 
-  // Create the table and replace the element
-  const table = WebImporter.DOMUtils.createTable(cards, document);
-  element.replaceWith(table);
+    return [image, [title, description].filter(Boolean)];
+  };
+
+  // Extract all cards
+  const cards = Array.from(element.querySelectorAll('.jet-hor-timeline-item')).map((cardElement) => extractCardData(cardElement));
+
+  // Create the table
+  const tableData = [headerRow, ...cards];
+  const blockTable = WebImporter.DOMUtils.createTable(tableData, document);
+
+  // Replace the original element with the block table
+  element.replaceWith(blockTable);
 }

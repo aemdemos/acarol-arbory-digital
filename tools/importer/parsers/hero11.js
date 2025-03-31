@@ -1,54 +1,47 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  const cells = [];
-
-  // Header row
   const headerRow = ['Hero'];
-  cells.push(headerRow);
 
-  // Content row
-  const contentRow = [];
-
-  // Extract the image from the first column
-  const imageElement = element.querySelector('img');
-  const fragments = [];
-  if (imageElement) {
-    const image = document.createElement('img');
-    image.src = imageElement.getAttribute('data-lazy-src') || imageElement.src;
-    image.alt = imageElement.alt || '';
-    fragments.push(image);
+  // Extract image dynamically
+  const imageContainer = element.querySelector('.elementor-widget-image img');
+  let image = null;
+  if (imageContainer) {
+    image = document.createElement('img');
+    image.src = imageContainer.getAttribute('data-lazy-src') || imageContainer.src;
   }
 
-  // Create and style the heading
-  const headingElement = element.querySelector('h1');
-  if (headingElement) {
-    const heading = document.createElement('h1');
-    heading.innerHTML = headingElement.innerHTML;
-    fragments.push(heading);
+  // Extract heading dynamically
+  const headingContainer = element.querySelector('.elementor-widget-text-editor h1');
+  let heading = null;
+  if (headingContainer) {
+    heading = document.createElement('h1');
+    heading.textContent = headingContainer.textContent;
   }
 
-  // Add subheading if available
-  const subheadingElement = element.querySelector('p');
-  if (subheadingElement) {
-    const subheading = document.createElement('p');
-    subheading.innerHTML = subheadingElement.innerHTML;
-    fragments.push(subheading);
+  // Extract subheading dynamically
+  const subheadingContainer = element.querySelector('.elementor-widget-text-editor p');
+  let subheading = null;
+  if (subheadingContainer) {
+    subheading = document.createElement('p');
+    subheading.textContent = subheadingContainer.textContent;
   }
 
-  // Add the call-to-action button if available
-  const buttonElement = element.querySelector('.elementor-button');
-  if (buttonElement) {
-    const cta = document.createElement('a');
-    cta.href = buttonElement.href;
-    cta.innerHTML = buttonElement.textContent.trim();
-    fragments.push(cta);
+  // Extract call-to-action dynamically
+  const buttonContainer = element.querySelector('.elementor-widget-button a');
+  let callToAction = null;
+  if (buttonContainer) {
+    callToAction = document.createElement('p');
+    const link = document.createElement('a');
+    link.href = buttonContainer.href;
+    link.textContent = buttonContainer.querySelector('.elementor-button-text')?.textContent || '';
+    callToAction.appendChild(link);
   }
 
-  contentRow.push(fragments);
-  cells.push(contentRow);
+  const cells = [
+    headerRow,
+    [image, heading, subheading, callToAction].filter(Boolean) // Filter out null values
+  ];
 
-  // Create the block table
-  const block = WebImporter.DOMUtils.createTable(cells, document);
-
-  // Replace the original element with the new block table
-  element.replaceWith(block);
+  const table = WebImporter.DOMUtils.createTable(cells, document);
+  element.replaceWith(table);
 }

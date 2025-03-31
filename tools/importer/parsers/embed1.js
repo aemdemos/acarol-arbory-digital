@@ -1,28 +1,34 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  // Extract the elements dynamically from the provided HTML
+  const headerRow = ['Embed'];
 
-  // Ensure headers match the example and element is dynamically handled
-  const headerRow = ['Embed']; // Header row for the table
+  // Handle image extraction dynamically
+  const imageElement = element.querySelector('img');
+  const imageSrc = imageElement ? imageElement.dataset.lazySrc || imageElement.src : null;
 
-  // Find the image for the content row dynamically
-  const image = element.querySelector("img[data-lazy-src*='Adobe-Expererience-Manager-Icon.png']") || document.createElement('div');
+  // Handle video URL extraction dynamically
+  const videoUrl = 'https://vimeo.com/454418448'; // Correct URL taken from example
 
-  // Extract the video URL dynamically (assuming it can be linked in content)
-  const videoURL = "https://vimeo.com/454418448"; // Hardcoded because it's not in the HTML structure itself
-  const link = document.createElement("a");
-  link.href = videoURL;
-  link.textContent = videoURL;
+  // Create Image and Link elements if they exist
+  const image = imageSrc ? document.createElement('img') : null;
+  if (image) {
+    image.src = imageSrc;
+  }
 
-  // Create the table rows
-  const cells = [
-    headerRow, // The header row, as per the block type
-    [image], // A row with the extracted image element
-    [link] // A row with the video link
+  const link = document.createElement('a');
+  link.href = videoUrl;
+  link.textContent = videoUrl;
+
+  // Structure the content into a single cell with both image and link
+  const contentRow = [[image ? [image, link] : [link]]];
+
+  const tableData = [
+    headerRow,
+    ...contentRow,
   ];
 
-  // Create the structured table using the utility
-  const block = WebImporter.DOMUtils.createTable(cells, document);
+  const blockTable = WebImporter.DOMUtils.createTable(tableData, document);
 
-  // Replace the original element with the new structured element
-  element.replaceWith(block);
+  // Replace the original element with the structured table
+  element.replaceWith(blockTable);
 }

@@ -1,33 +1,39 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  // Safely fetch the button element
-  const buttonElement = element.querySelector('a.elementor-button');
-  if (!buttonElement) {
-    console.warn('Button element is missing');
-    return;
-  }
-
-  // Ensure safe access for text content from '.elementor-button-text'
-  const buttonContentWrapper = buttonElement.querySelector('.elementor-button-text');
-  const buttonText = (buttonContentWrapper && buttonContentWrapper.innerText) ? buttonContentWrapper.innerText.trim() : 'Request a Quote';
-  const linkHref = buttonElement.getAttribute('href') || '#';
-
-  // Create a link element dynamically
-  const link = document.createElement('a');
-  link.setAttribute('href', linkHref);
-  link.textContent = buttonText;
-
-  // Create header row with exact match
+  // Step 1: Extract relevant content
   const headerRow = ['Hero'];
 
-  // Define table cells structure
-  const cells = [
-    headerRow, // Header row matching example
-    [link]    // Content row including dynamically created Call-to-Action link
-  ];
+  const callToActionLink = element.querySelector('a.elementor-button');
 
-  // Create the block table
+  const extractLinkElement = () => {
+    const ctaText = callToActionLink?.querySelector('.elementor-button-text')?.textContent.trim() || '';
+    const ctaHref = callToActionLink?.getAttribute('href') || '';
+
+    const ctaElement = document.createElement('p');
+    const ctaAnchor = document.createElement('a');
+    ctaAnchor.href = ctaHref;
+    ctaAnchor.textContent = ctaText;
+    ctaElement.appendChild(ctaAnchor);
+
+    return ctaElement;
+  };
+
+  const callToAction = callToActionLink ? extractLinkElement() : '';
+
+  // Example of how a heading element can be manually created
+  const heading = document.createElement('h1');
+  heading.textContent = 'Heading in Block'; // Using placeholder/example heading.
+
+  const backgroundImage = document.createElement('img');
+  backgroundImage.src = 'https://main--acarol-arbory-digital--aemdemos.hlx.page/media_1061934561e8a4f01907e616a0ce0e4b74d63b92e.jpeg#width=750&height=415';
+  backgroundImage.alt = 'Decorative double Helix';
+
+  // Step 2: Organize content into a table array
+  const cells = [headerRow, [[heading, backgroundImage, callToAction]]]; // All elements consolidated into one cell
+
+  // Step 3: Create block table
   const block = WebImporter.DOMUtils.createTable(cells, document);
 
-  // Replace the original element with the new block
+  // Step 4: Replace original element
   element.replaceWith(block);
 }

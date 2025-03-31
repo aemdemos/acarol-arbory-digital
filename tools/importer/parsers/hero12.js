@@ -1,53 +1,42 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  // Create the header row with strong-typed header text "Hero" matching the example
-  const headerCell = document.createElement('strong');
-  headerCell.textContent = 'Hero';
-  const headerRow = [headerCell];
+  const headerRow = ['Hero'];
 
-  // Extract title
-  const titleElement = element.querySelector('.elementor-heading-title');
-  const title = titleElement ? document.createElement('h1') : null;
-  if (titleElement) {
-    title.textContent = titleElement.textContent.trim();
+  // Safely extract content from the HTML structure
+  const titleElementRaw = element.querySelector('.elementor-heading-title');
+  const titleText = titleElementRaw && titleElementRaw.textContent ? titleElementRaw.textContent.trim() : '';
+  const titleElement = document.createElement('h1');
+  titleElement.textContent = titleText;
+
+  const subtitleElementRaw = element.querySelector('h3.elementor-heading-title');
+  const subtitleText = subtitleElementRaw && subtitleElementRaw.textContent ? subtitleElementRaw.textContent.trim() : '';
+  const subtitleElement = document.createElement('h3');
+  subtitleElement.textContent = subtitleText;
+
+  const paragraphElementRaw = element.querySelector('p');
+  const paragraphText = paragraphElementRaw && paragraphElementRaw.textContent ? paragraphElementRaw.textContent.trim() : '';
+  const paragraphElement = document.createElement('p');
+  paragraphElement.textContent = paragraphText;
+
+  const ctaElementRaw = element.querySelector('h2.elementor-heading-title a');
+  const ctaLink = document.createElement('a');
+  if (ctaElementRaw && ctaElementRaw.href) {
+    ctaLink.href = ctaElementRaw.href;
+    ctaLink.textContent = ctaElementRaw.textContent ? ctaElementRaw.textContent.trim() : '';
+  } else {
+    ctaLink.textContent = '';
   }
 
-  // Extract subtitle
-  const subtitleElement = element.querySelector('h3.elementor-heading-title');
-  const subtitle = subtitleElement ? document.createElement('h2') : null;
-  if (subtitleElement) {
-    subtitle.textContent = subtitleElement.textContent.trim();
-  }
+  // Adjust rows to match the example, consolidating content into a single column
+  const contentRow = [[titleElement, subtitleElement, paragraphElement, ctaLink]];
 
-  // Extract paragraph
-  const paragraphElement = element.querySelector('.elementor-widget-text-editor p');
-  const paragraph = paragraphElement ? document.createElement('p') : null;
-  if (paragraphElement) {
-    paragraph.textContent = paragraphElement.textContent.trim();
-  }
-
-  // Extract call-to-action link
-  const ctaLinkElement = element.querySelector('a[href]');
-  const cta = ctaLinkElement ? document.createElement('a') : null;
-  if (ctaLinkElement) {
-    cta.href = ctaLinkElement.href;
-    cta.textContent = ctaLinkElement.textContent.trim();
-  }
-
-  // Combine extracted elements into a single cell in the second row
-  const contentRow = [];
-  if (title) contentRow.push(title);
-  if (subtitle) contentRow.push(subtitle);
-  if (paragraph) contentRow.push(paragraph);
-  if (cta) contentRow.push(cta);
-
-  const tableData = [
-    headerRow, // Header row
-    [contentRow] // Content row
+  const cells = [
+    headerRow, // Block type header (this stays as a single column)
+    [contentRow.flat()] // Consolidated single cell for the 2nd row
   ];
 
-  // Create the block table using `WebImporter.DOMUtils.createTable`
-  const blockTable = WebImporter.DOMUtils.createTable(tableData, document);
+  const blockTable = WebImporter.DOMUtils.createTable(cells, document);
 
-  // Replace the original element with the new block table
+  // Replace the original element with the new table
   element.replaceWith(blockTable);
 }

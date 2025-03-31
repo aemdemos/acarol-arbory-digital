@@ -1,44 +1,48 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-    const headerCell = document.createElement('strong');
-    headerCell.textContent = 'Cards';
-    const headerRow = [headerCell];
+  const rows = [];
 
-    // Extract all columns containing card data
-    const columns = Array.from(element.querySelectorAll('.elementor-column'));
+  // Add header row
+  rows.push(['Cards']);
 
-    // Collect and structure data from each card
-    const rows = columns.map((col) => {
-        const wrapper = col.querySelector('.elementor-widget-wrap');
+  // Loop through columns to extract card details
+  const columns = element.querySelectorAll('.elementor-column');
+  columns.forEach((column) => {
+    const icon = column.querySelector('.elementor-icon-box-icon a i');
+    const title = column.querySelector('h2.elementor-heading-title');
+    const description = column.querySelector('p');
+    const cta = column.querySelector('.elementor-button-wrapper a');
 
-        // Extract icon/image
-        const iconBox = wrapper.querySelector('.elementor-icon');
-        const icon = iconBox ? iconBox.cloneNode(true) : document.createElement('div');
+    // Extract and prepare elements
+    const iconElement = icon ? icon.cloneNode(true) : null; // Clone the icon element
+    const content = [];
 
-        // Extract title
-        const heading = wrapper.querySelector('.elementor-heading-title');
-        const title = heading ? heading.cloneNode(true) : document.createElement('div');
+    if (title) {
+      const titleElement = document.createElement('strong');
+      titleElement.textContent = title.textContent.trim();
+      content.push(titleElement);
+      content.push(document.createElement('br'));
+    }
 
-        // Extract description
-        const descriptionElement = wrapper.querySelector('.elementor-widget-text-editor p');
-        const description = descriptionElement ? descriptionElement.cloneNode(true) : document.createElement('div');
+    if (description) {
+      content.push(document.createTextNode(description.textContent.trim()));
+      content.push(document.createElement('br'));
+    }
 
-        // Extract CTA
-        const ctaElement = wrapper.querySelector('.elementor-button');
-        const cta = ctaElement ? ctaElement.cloneNode(true) : document.createElement('div');
+    if (cta) {
+      const ctaLink = document.createElement('a');
+      ctaLink.href = cta.getAttribute('href');
+      ctaLink.textContent = cta.textContent.trim();
+      content.push(ctaLink);
+    }
 
-        // Combine structured data into second cell
-        const contentCell = document.createElement('div');
-        [title, description, cta].forEach((el) => contentCell.appendChild(el));
+    // Add row to table
+    rows.push([iconElement, content]);
+  });
 
-        return [icon, contentCell];
-    });
+  // Create the table block
+  const table = WebImporter.DOMUtils.createTable(rows, document);
 
-    // Build table rows: header + card rows
-    const tableData = [headerRow, ...rows];
-
-    // Create Cards table block
-    const cardsTable = WebImporter.DOMUtils.createTable(tableData, document);
-
-    // Replace element with Cards table block
-    element.replaceWith(cardsTable);
+  // Replace the original element with the table
+  element.replaceWith(table);
 }

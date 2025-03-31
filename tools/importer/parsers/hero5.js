@@ -1,40 +1,50 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  const tableData = [];
+  // Step 1: Extract relevant content from the input element
+  const titleElement = element.querySelector('h1.elementor-heading-title');
+  const backgroundOverlay = element.querySelector('.elementor-background-overlay');
 
-  // Header row
+  // Extract title text
+  const title = titleElement ? titleElement.textContent.trim() : '';
+
+  // Extract background image URL, if present
+  const backgroundImage = backgroundOverlay && backgroundOverlay.style.backgroundImage
+    ? backgroundOverlay.style.backgroundImage.match(/url\("(.*?)"\)/)?.[1]
+    : '';
+
+  // Step 2: Organize extracted content into the table structure
+  /*
+   * The table has:
+   * - Header row: ['Hero']
+   * - Content row: Contains the background image (if available) and title text.
+   */
   const headerRow = ['Hero'];
-  tableData.push(headerRow);
 
-  // Content row
   const contentRow = [];
 
-  // Extract title (mandatory)
-  const titleElement = element.querySelector('h1');
-  if (titleElement) {
-    const title = document.createElement('h1');
-    title.textContent = titleElement.textContent;
-    contentRow.push(title);
+  // Include the title as an HTML element in the content row
+  if (title) {
+    const heading = document.createElement('h1');
+    heading.textContent = title;
+    contentRow.push(heading);
   }
 
-  // Background image (optional)
-  const imageElement = element.querySelector('.jet-parallax-section__image');
-  if (
-    imageElement &&
-    imageElement.style.backgroundImage &&
-    imageElement.style.backgroundImage !== 'none'
-  ) {
-    const imageUrl = imageElement.style.backgroundImage.match(/url\("(.*?)"\)/);
-    if (imageUrl && imageUrl[1]) {
-      const image = document.createElement('img');
-      image.src = imageUrl[1];
-      contentRow.push(image);
-    }
+  // Include the background image as an HTML img element, if available
+  if (backgroundImage) {
+    const img = document.createElement('img');
+    img.setAttribute('src', backgroundImage);
+    contentRow.push(img);
   }
 
-  // Add content row to table data
-  tableData.push([contentRow]);
+  const tableData = [
+    headerRow,
+    contentRow
+  ];
 
-  // Create block table and replace original element
+  // Step 3: Create the block table using the WebImporter helper utility
   const blockTable = WebImporter.DOMUtils.createTable(tableData, document);
+
+  // Step 4: Replace the original element with the new block table
   element.replaceWith(blockTable);
+  
 }

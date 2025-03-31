@@ -1,35 +1,38 @@
+/* global WebImporter */
+
 export default function parse(element, { document }) {
-  // Create the header row matching the example exactly
-  const headerCell = document.createElement('strong');
-  headerCell.textContent = 'Hero';
-  const headerRow = [headerCell];
+  // Create an array to store rows of the table
+  const cells = [];
 
-  // Extract relevant dynamic content for timeline items
-  const timelineItemCards = Array.from(
-    element.querySelectorAll('.jet-hor-timeline-item__card')
-  );
+  // Header Row (denoting block type)
+  const headerRow = ['Hero'];
+  cells.push(headerRow);
 
-  const rows = timelineItemCards.map((card) => {
-    // Extract title dynamically
-    const titleElement = card.querySelector('.jet-hor-timeline-item__card-title');
-    const title = document.createElement('h1');
-    title.textContent = titleElement ? titleElement.textContent.trim() : '';
+  // Find and dynamically extract key data
+  // Extract Image
+  const imgElement = element.querySelector('.jet-hor-timeline-item__card-img img');
+  let img;
+  if (imgElement) {
+    img = document.createElement('img');
+    img.src = imgElement.dataset.lazySrc || imgElement.src;
+    img.alt = imgElement.alt || '';
+  }
 
-    // Extract image dynamically
-    const imageElement = card.querySelector('img');
-    const image = document.createElement('img');
-    image.src = imageElement ? imageElement.getAttribute('data-lazy-src') || imageElement.src : '';
-    image.alt = imageElement ? imageElement.alt || '' : '';
+  // Extract Title
+  const titleElement = element.querySelector('.jet-hor-timeline-item__card-title');
+  let title;
+  if (titleElement) {
+    title = document.createElement('h1');
+    title.textContent = titleElement.textContent.trim();
+  }
 
-    return [title, image];
-  });
+  // Combine extracted elements into the second row content
+  const secondRowContent = [];
+  if (img) secondRowContent.push(img);
+  if (title) secondRowContent.push(title);
+  cells.push(secondRowContent);
 
-  // Assemble the table content
-  const tableContent = [headerRow, ...rows];
-
-  // Create the table using WebImporter.DOMUtils.createTable helper function
-  const table = WebImporter.DOMUtils.createTable(tableContent, document);
-
-  // Replace the original element with the constructed table
-  element.replaceWith(table);
+  // Create and replace the table using the utility function
+  const block = WebImporter.DOMUtils.createTable(cells, document);
+  element.replaceWith(block);
 }

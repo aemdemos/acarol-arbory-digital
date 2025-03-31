@@ -1,34 +1,32 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  const cells = [];
+  // Helper functions
+  const extractColumns = () => {
+    const columns = [];
+    const columnElements = element.querySelectorAll('.elementor-widget-wrap.elementor-element-populated');
 
-  // Create header row
-  const headerRow = ['Columns'];
-  cells.push(headerRow);
+    columnElements.forEach((column) => {
+      const iconContainer = column.querySelector('.elementor-icon > i');
+      const heading = column.querySelector('h2.elementor-heading-title');
 
-  // Extract columns
-  Array.from(element.querySelectorAll('.elementor-column')).forEach((column) => {
-    const iconWrapper = column.querySelector('.elementor-icon-wrapper .elementor-icon i');
-    const heading = column.querySelector('.elementor-widget-heading .elementor-heading-title');
+      if (iconContainer && heading) {
+        // Directly add the elements without wrapping them in an extra div
+        columns.push([iconContainer.cloneNode(true), heading.cloneNode(true)]);
+      }
+    });
 
-    if (iconWrapper && heading) {
-      const icon = document.createElement('i');
-      icon.className = iconWrapper.className;
+    return columns;
+  };
 
-      const headingContent = document.createElement('h2');
-      headingContent.textContent = heading.textContent;
+  const createTableCells = (columns) => {
+    const headerRow = ['Columns'];
+    const dataRow = columns.map((col) => col); // Directly pass the elements array
+    return [headerRow, dataRow];
+  };
 
-      // Combine icon and heading into a single table cell
-      const combinedCellContent = document.createElement('div');
-      combinedCellContent.appendChild(icon);
-      combinedCellContent.appendChild(headingContent);
+  const columns = extractColumns();
+  const tableCells = createTableCells(columns);
+  const tableBlock = WebImporter.DOMUtils.createTable(tableCells, document);
 
-      cells.push([combinedCellContent]);
-    }
-  });
-
-  // Create table block
-  const block = WebImporter.DOMUtils.createTable(cells, document);
-
-  // Replace the element
-  element.replaceWith(block);
+  element.replaceWith(tableBlock);
 }

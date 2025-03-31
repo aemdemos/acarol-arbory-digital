@@ -1,52 +1,46 @@
-export default function parse(element, context) {
-  const { document } = context;
+/* global WebImporter */
+export default function parse(element, { document }) {
+  const headerRow = ['Hero'];
 
-  // Create and match header row exactly
-  const headerCell = document.createElement('strong');
-  headerCell.textContent = 'Hero';
-  const headerRow = [headerCell];
-
-  // Extract heading
-  const titleElement = element.querySelector('h2');
-  const title = titleElement ? document.createElement('h2') : null;
-  if (title && titleElement.textContent) {
-    title.textContent = titleElement.textContent.trim();
+  // Extract Heading
+  const headingDiv = element.querySelector('.elementor-heading-title');
+  const headingText = headingDiv ? headingDiv.textContent.trim() : '';
+  const heading = headingText ? document.createElement('h1') : null;
+  if (heading) {
+    heading.textContent = headingText;
   }
 
-  // Extract paragraph
-  const paragraphElement = element.querySelector('p');
-  const paragraph = paragraphElement ? document.createElement('p') : null;
-  if (paragraph && paragraphElement.textContent) {
-    paragraph.textContent = paragraphElement.textContent.trim();
+  // Extract Description
+  const descriptionDiv = element.querySelector('.elementor-widget-text-editor');
+  const descriptionText = descriptionDiv ? descriptionDiv.textContent.trim() : '';
+  const description = descriptionText ? document.createElement('p') : null;
+  if (description) {
+    description.textContent = descriptionText;
   }
 
-  // Extract button with link
-  const buttonElement = element.querySelector('a.elementor-button');
-  let button = null;
-  if (buttonElement) {
-    button = document.createElement('div');
-    const link = document.createElement('a');
-    link.href = buttonElement.href;
-    link.textContent = buttonElement.textContent.trim();
-    button.appendChild(link);
+  // Extract Call-to-Action
+  const ctaDiv = element.querySelector('.elementor-widget-button a');
+  const ctaLink = ctaDiv ? ctaDiv.href : '';
+  const ctaText = ctaDiv ? ctaDiv.textContent.trim() : '';
+  const cta = ctaLink && ctaText ? document.createElement('a') : null;
+  if (cta) {
+    cta.href = ctaLink;
+    cta.textContent = ctaText;
   }
 
-  // Combine heading, paragraph, and button into a single cohesive content cell
-  const contentCellElements = [];
-  if (title) contentCellElements.push(title);
-  if (paragraph) contentCellElements.push(paragraph);
-  if (button) contentCellElements.push(button);
-  const contentRow = [contentCellElements];
+  // Combine all extracted content
+  const combinedContent = document.createElement('div');
+  [heading, description, cta].filter(Boolean).forEach((el) => combinedContent.appendChild(el));
 
-  // Combine extracted content into cells
-  const cells = [
-    headerRow, // Header row
-    contentRow // Content row
+  // Table structure: Header row (1 column) + Content row (1 column)
+  const tableRows = [
+    headerRow,
+    [combinedContent],
   ];
 
-  // Create the table block
-  const block = WebImporter.DOMUtils.createTable(cells, document);
+  // Construct the block table
+  const block = WebImporter.DOMUtils.createTable(tableRows, document);
 
-  // Replace original element with the new block table
+  // Replace the original element with the new table
   element.replaceWith(block);
 }

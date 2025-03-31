@@ -1,56 +1,43 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-    // Extract the Heading title
-    const headingElement = element.querySelector('h2.elementor-heading-title');
-    const headingText = headingElement ? headingElement.textContent.trim() : '';
+  const headerRow = ['Hero'];
 
-    // Extract subheading text (if available)
-    const subheadingElement = element.querySelector('p');
-    const subheadingText = subheadingElement ? subheadingElement.textContent.trim() : '';
+  // Extract heading (e.g., 'Our AEM Team') dynamically
+  const headingElement = element.querySelector('.elementor-widget-heading .elementor-heading-title');
+  const headingText = headingElement ? document.createElement('h1') : null;
+  if (headingText) headingText.textContent = headingElement.textContent.trim();
 
-    // Extract the Call-To-Action link element
-    const ctaElement = element.querySelector('a.elementor-button');
-    const ctaText = ctaElement?.textContent.trim();
-    const ctaHref = ctaElement?.getAttribute('href');
-    const ctaLink = ctaText && ctaHref ? (() => {
-        const link = document.createElement('a');
-        link.setAttribute('href', ctaHref);
-        link.textContent = ctaText;
-        return link;
-    })() : null;
+  // Extract subheading paragraph dynamically
+  const paragraphElement = element.querySelector('.elementor-widget-text-editor p');
+  const paragraph = paragraphElement ? document.createElement('p') : null;
+  if (paragraph) paragraph.textContent = paragraphElement.textContent.trim();
 
-    // Extract image src (if any)
-    const imageElement = element.querySelector('img');
-    const imageSrc = imageElement?.getAttribute('src') || '';
+  // Extract call-to-action button dynamically
+  const buttonElement = element.querySelector('.elementor-widget-button .elementor-button');
+  const button = buttonElement ? document.createElement('a') : null;
+  if (button) {
+    button.textContent = buttonElement.textContent.trim();
+    button.href = buttonElement.getAttribute('href');
+  }
 
-    const imgTag = imageSrc ? (() => {
-        const img = document.createElement('img');
-        img.setAttribute('src', imageSrc);
-        return img;
-    })() : null;
+  // Extract background image dynamically
+  const backgroundImageElement = element.querySelector('img');
+  const backgroundImage = backgroundImageElement ? document.createElement('img') : null;
+  if (backgroundImage) {
+    backgroundImage.src = backgroundImageElement.getAttribute('src');
+    backgroundImage.alt = backgroundImageElement.getAttribute('alt') || '';
+  }
 
-    const heading = (() => {
-        const headingNode = document.createElement('h1');
-        headingNode.textContent = headingText;
-        return headingNode;
-    })();
+  // Structure the content array, handle missing elements gracefully
+  const contentRow = [];
+  if (backgroundImage) contentRow.push(backgroundImage);
+  if (headingText) contentRow.push(headingText);
+  if (paragraph) contentRow.push(paragraph);
+  if (button) contentRow.push(button);
 
-    const subheading = subheadingText ? (() => {
-        const subheadingNode = document.createElement('p');
-        subheadingNode.textContent = subheadingText;
-        return subheadingNode;
-    })() : null;
+  const tableData = [headerRow, contentRow];
+  const blockTable = WebImporter.DOMUtils.createTable(tableData, document);
 
-    const contentRow = [];
-    if (imgTag) contentRow.push(imgTag);
-    if (heading) contentRow.push(heading);
-    if (subheading) contentRow.push(subheading);
-    if (ctaLink) contentRow.push(ctaLink);
-
-    const cells = [
-        ['Hero'],
-        [contentRow],
-    ];
-
-    const table = WebImporter.DOMUtils.createTable(cells, document);
-    element.replaceWith(table);
+  // Replace the original element with the new block table
+  element.replaceWith(blockTable);
 }

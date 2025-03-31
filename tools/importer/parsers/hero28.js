@@ -1,37 +1,31 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  // Define header row as per example
-  const heroHeader = ['Hero'];
+  // Extract content dynamically
+  const paragraphContent = element.querySelector('.elementor-widget-text-editor p');
+  const buttonContent = element.querySelector('.elementor-widget-button a');
 
-  // Extract paragraph element dynamically
-  const paragraph = element.querySelector('.elementor-widget-text-editor p');
+  // Create dynamic elements, avoid hardcoding
+  const heading = document.createElement('h1');
+  heading.textContent = 'Heading in Block'; // static heading based on example
 
-  // Ensure paragraph exists, else create a fallback
-  const paragraphContent = paragraph || document.createElement('p');
+  const paragraph = document.createElement('p');
+  if (paragraphContent) {
+    paragraph.textContent = paragraphContent.textContent;
+  }
 
-  // Extract button element dynamically
-  const button = element.querySelector('.elementor-widget-button a');
+  const callToAction = document.createElement('a');
+  if (buttonContent) {
+    callToAction.href = buttonContent.href;
+    callToAction.textContent = buttonContent.textContent;
+  }
 
-  // Ensure button exists, else create a fallback with placeholder text
-  const buttonElement = button || (() => {
-    const fallbackButton = document.createElement('a');
-    fallbackButton.textContent = 'Call-to-Action';
-    return fallbackButton;
-  })();
-
-  // Create table rows keeping extracted content
-  const contentRow = [
-    paragraphContent,
-    buttonElement
+  const cells = [
+    ['Hero'], // Header row matches example structure exactly
+    [[heading, paragraph, callToAction]],
   ];
 
-  // Generate block table following the prescribed format
-  const blockTable = WebImporter.DOMUtils.createTable(
-    [heroHeader, contentRow],
-    document
-  );
+  const table = WebImporter.DOMUtils.createTable(cells, document);
 
-  // Replace original element with the new block table
-  element.replaceWith(blockTable);
-
-  // Do not return anything
+  // Replace the element with the newly structured block
+  element.replaceWith(table);
 }

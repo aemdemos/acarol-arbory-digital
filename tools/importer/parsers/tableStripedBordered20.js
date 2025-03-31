@@ -1,26 +1,28 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-    // Extract the title text from the provided header element
-    const headlineElement = element.querySelector('[itemprop="headline"]');
-    const headline = headlineElement ? headlineElement.textContent.trim() : 'No headline found';
+  // Extract the title from the header
+  const titleElement = element.querySelector('h2.single-post-title.entry-title');
 
-    // Define table structure for the replacement block
-    const headerCell = document.createElement('strong');
-    headerCell.textContent = 'Table (striped, bordered)';
-    const headerRow = [headerCell];
-    const contentRow = [document.createTextNode(headline)];
+  // Handle empty or missing data
+  if (!titleElement) {
+    console.warn('No title found in the provided element');
+    return;
+  }
 
-    const cells = [
-        headerRow, // Header row
-        contentRow, // Content row
-    ];
+  const title = document.createElement('h2');
+  title.textContent = titleElement.textContent.trim(); // Extract dynamic content
 
-    // Create a table block using the helper function
-    const block = WebImporter.DOMUtils.createTable(cells, document);
+  // Create the header row for the table
+  const headerRow = ['Block Title'];
 
-    // Replace the original element with the created table block
-    if (element.parentNode) {
-        element.replaceWith(block);
-    } else {
-        console.error('Parent node not available for element replacement');
-    }
+  // Create content rows based on the extracted content
+  const contentRows = [
+    [title],
+  ];
+
+  // Build table structure
+  const table = WebImporter.DOMUtils.createTable([headerRow, ...contentRows], document);
+
+  // Replace the original element with the new table block
+  element.replaceWith(table);
 }

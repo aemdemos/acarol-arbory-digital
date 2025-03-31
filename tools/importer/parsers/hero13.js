@@ -1,40 +1,35 @@
+/* global WebImporter */
+
 export default function parse(element, { document }) {
-  // Extract the logo link and embedded image dynamically
-  const logoImg = element.querySelector('img');
-  const logoLink = logoImg.closest('a');
+  // Extract the logo
+  const logoElement = element.querySelector('.elementor-widget-image a img');
+  const logo = logoElement ? `<div class="logo-container">${logoElement.outerHTML}</div>` : '';
 
-  // Extract unique navigation links, avoiding duplicates
-  const navMenus = element.querySelectorAll('.elementor-nav-menu');
-  const uniqueLinks = new Map();
+  // Extract navigation menu items dynamically
+  const menuLinks = [...element.querySelectorAll('.elementor-nav-menu a')]
+    .map(link => `<li>${link.outerHTML}</li>`)
+    .join('');
+  const menuHTML = menuLinks ? `<ul class="menu-links">${menuLinks}</ul>` : '';
 
-  navMenus.forEach((menu) => {
-    menu.querySelectorAll('a').forEach((link) => {
-      uniqueLinks.set(link.href, link.textContent.trim());
-    });
-  });
+  // Extract the podcast image dynamically
+  const podcastElement = element.querySelector('.elementor-widget-image:nth-of-type(2) a img');
+  const podcastImage = podcastElement ? `<div class="podcast-image">${podcastElement.outerHTML}</div>` : '';
 
-  const navigationLinks = Array.from(uniqueLinks.entries()).map(([href, textContent]) => {
-    const a = document.createElement('a');
-    a.href = href;
-    a.textContent = textContent;
-    return a;
-  });
+  // Combine all content into a single structured block
+  const combinedContent = `<div class="hero-content">
+    ${logo}
+    ${menuHTML}
+    ${podcastImage}
+  </div>`;
 
-  // Create the header row matching the example
-  const headerCell = document.createElement('strong');
-  headerCell.textContent = 'Hero';
-  const headerRow = [headerCell];
-
-  // Include only the logo link with the embedded image, no redundant image
-  const logoCellContent = [logoLink, ...navigationLinks];
-
-  // Structured table cells
+  // Create a structured table adhering to the example markdown
   const cells = [
-    headerRow,
-    [logoCellContent],
+    ['Hero'], // Correct header row
+    [document.createRange().createContextualFragment(combinedContent)] // Combine all content logically into a single cell using HTML fragments
   ];
 
-  // Create and replace the block table
-  const table = WebImporter.DOMUtils.createTable(cells, document);
-  element.replaceWith(table);
+  const block = WebImporter.DOMUtils.createTable(cells, document);
+
+  // Replace the original element with the structured block
+  element.replaceWith(block);
 }

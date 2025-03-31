@@ -1,35 +1,26 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-    const createTable = WebImporter.DOMUtils.createTable;
+  // Initializing the header row as per the example
+  const headerRow = ['Embed'];
 
-    // Extract the title
-    const titleElement = element.querySelector('.elementor-widget-heading .elementor-heading-title');
-    const title = titleElement ? titleElement.textContent.trim() : '';
+  // Extracting social media links dynamically from the HTML
+  const socialLinks = element.querySelectorAll('.elementor-social-icons-wrapper .elementor-grid-item a');
 
-    // Extract the social links
-    const socialLinksContainer = element.querySelector('.elementor-social-icons-wrapper');
-    const socialLinks = [];
-    if (socialLinksContainer) {
-        const icons = socialLinksContainer.querySelectorAll('a');
-        icons.forEach((icon) => {
-            const href = icon.getAttribute('href');
-            if (href) {
-                const linkElement = document.createElement('a');
-                linkElement.setAttribute('href', href);
-                linkElement.textContent = href;
-                socialLinks.push(linkElement);
-            }
-        });
-    }
+  // Creating an array for each extracted link
+  const linkElements = [];
+  socialLinks.forEach((link) => {
+    const linkElement = document.createElement('a');
+    linkElement.href = link.href;
+    linkElement.textContent = link.href; // Making link text visible
+    linkElements.push(linkElement);
+  });
 
-    // Construct the table data
-    const tableData = [
-        ['Embed'], // Header row matches example
-        socialLinks.length > 0 ? [socialLinks] : ['No social links available']
-    ];
+  // Creating the block table using dynamic data
+  const blockTable = WebImporter.DOMUtils.createTable([
+    headerRow,
+    [linkElements],
+  ], document);
 
-    // Create the table block
-    const tableBlock = createTable(tableData, document);
-
-    // Replace the original element with the new block table
-    element.replaceWith(tableBlock);
+  // Replace the original element with the new block table
+  element.replaceWith(blockTable);
 }

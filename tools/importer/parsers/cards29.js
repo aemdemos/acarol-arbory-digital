@@ -1,50 +1,56 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-    // Import the needed helper
-    const { createTable } = WebImporter.DOMUtils;
+    const tableData = [];
 
-    // Create the header row for the table
-    const headerCell = document.createElement('strong');
-    headerCell.textContent = 'Cards';
-    const headerRow = [headerCell];
+    // Add the header row
+    tableData.push(['Cards']);
 
-    // Extract cards
-    const cards = Array.from(element.querySelectorAll('.jet-posts__item')).map(card => {
-        // Image extraction
-        const imgLink = card.querySelector('.post-thumbnail__link img');
-        const image = document.createElement('img');
-        image.src = imgLink.dataset.lazySrc || imgLink.src;
-        image.alt = imgLink.getAttribute('alt');
-        
-        // Text extraction
-        const titleLink = card.querySelector('.entry-title a');
-        const title = document.createElement('strong'); // Styled heading as per example
-        title.textContent = titleLink.textContent;
+    // Extract card content
+    const cards = element.querySelectorAll('.jet-posts__item');
 
-        const descriptionEl = card.querySelector('.entry-excerpt');
-        const description = descriptionEl ? document.createElement('p') : null;
-        if (descriptionEl) {
-            description.textContent = descriptionEl.textContent;
+    // Use a Set to filter out duplicates based on the URL of the card (Image URL is unique identifier for each card)
+    const processedUrls = new Set();
+
+    cards.forEach(card => {
+        const imageLink = card.querySelector('.post-thumbnail__link img');
+        const titleElement = card.querySelector('.entry-title a');
+        const descriptionElement = card.querySelector('.entry-excerpt');
+        const callToActionElement = card.querySelector('.jet-more-wrap a');
+
+        // Ensure the necessary elements exist and check for duplication
+        if (imageLink && titleElement && descriptionElement && callToActionElement) {
+            const imageUrl = imageLink.getAttribute('data-lazy-src') || imageLink.src;
+            if (!processedUrls.has(imageUrl)) {
+                processedUrls.add(imageUrl);
+
+                // Extract image
+                const image = document.createElement('img');
+                image.src = imageUrl;
+                image.alt = imageLink.alt;
+
+                // Extract title
+                const title = document.createElement('h3');
+                title.textContent = titleElement.textContent;
+
+                // Extract description
+                const description = document.createElement('p');
+                description.textContent = descriptionElement.textContent;
+
+                // Extract call-to-action
+                const callToAction = document.createElement('a');
+                callToAction.href = callToActionElement.href;
+                callToAction.textContent = callToActionElement.textContent;
+
+                const contentCell = [title, description, callToAction];
+
+                // Add row for this card
+                tableData.push([image, contentCell]);
+            }
         }
-
-        const ctaLink = card.querySelector('.jet-more-wrap a');
-        const cta = ctaLink ? document.createElement('a') : null;
-        if (ctaLink) {
-            cta.href = ctaLink.getAttribute('href');
-            cta.textContent = ctaLink.querySelector('.btn__text').textContent;
-        }
-
-        // Combine content into appropriate structure
-        const content = [title];
-        if (description) content.push(description);
-        if (cta) content.push(cta);
-
-        return [image, content];
     });
 
-    // Combine header and cards into the table structure
-    const tableData = [headerRow, ...cards];
+    const block = WebImporter.DOMUtils.createTable(tableData, document);
 
-    // Replace the element with the block table
-    const tableBlock = createTable(tableData, document);
-    element.replaceWith(tableBlock);
+    // Replace the original element with the new structured block
+    element.replaceWith(block);
 }

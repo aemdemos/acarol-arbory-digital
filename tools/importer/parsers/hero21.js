@@ -1,34 +1,49 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  const headerRow = ['Hero'];
+  const headerRow = ['Hero']; // Ensure the header row matches the example
 
-  // Extract title
-  const titleElement = element.querySelector('h1');
-  const titleText = titleElement ? titleElement.textContent.trim() : '';
-  const title = document.createElement('h1');
-  title.textContent = titleText;
+  // Extract Image URL dynamically
+  const backgroundImageStyle = element.querySelector('.jet-parallax-section__image')?.style.backgroundImage;
+  const imageUrlMatch = backgroundImageStyle?.match(/url\("(.*?)"\)/);
+  const imageUrl = imageUrlMatch ? imageUrlMatch[1] : '';
 
-  // Extract description
-  const descriptionElement = element.querySelector('.elementor-widget-text-editor .elementor-widget-container');
-  const descriptionText = descriptionElement ? descriptionElement.textContent.trim() : '';
-  const description = document.createElement('p');
-  description.textContent = descriptionText;
+  let imageElement;
+  if (imageUrl) {
+    imageElement = document.createElement('img');
+    imageElement.src = imageUrl;
+  }
 
-  // Extract call-to-action
-  const ctaElement = element.querySelector('.elementor-widget-button a');
-  const ctaText = ctaElement ? ctaElement.textContent.trim() : '';
-  const ctaLink = ctaElement ? ctaElement.href : '';
-  const cta = document.createElement('a');
-  cta.textContent = ctaText;
-  cta.href = ctaLink;
+  // Extract Title dynamically
+  const title = element.querySelector('h1')?.textContent.trim() || '';
+  const titleElement = document.createElement('h1');
+  titleElement.textContent = title;
 
-  // Construct block table
-  const cells = [
+  // Extract Subtext dynamically
+  const subText = element.querySelector('.elementor-widget-text-editor')?.textContent.trim() || '';
+  const subTextElement = document.createElement('p');
+  subTextElement.textContent = subText;
+
+  // Extract CTA Button dynamically
+  const ctaLink = element.querySelector('.elementor-button')?.href || '';
+  const ctaText = element.querySelector('.elementor-button-text')?.textContent.trim() || '';
+  let ctaElement;
+  if (ctaLink && ctaText) {
+    ctaElement = document.createElement('a');
+    ctaElement.href = ctaLink;
+    ctaElement.textContent = ctaText;
+  }
+
+  const content = [];
+  if (imageElement) content.push(imageElement); // Handle optional image
+  if (titleElement.textContent) content.push(titleElement); // Mandatory title
+  if (subTextElement.textContent) content.push(subTextElement); // Handle optional subtext
+  if (ctaElement) content.push(ctaElement); // Handle optional CTA
+
+  const tableData = [
     headerRow,
-    [title, description, cta]
+    [content],
   ];
 
-  const block = WebImporter.DOMUtils.createTable(cells, document);
-
-  // Replace the original element
-  element.replaceWith(block);
+  const blockTable = WebImporter.DOMUtils.createTable(tableData, document);
+  element.replaceWith(blockTable);
 }

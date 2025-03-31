@@ -1,46 +1,56 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  // Create the header row matching the example.
-  const headerRow = [document.createElement('strong')];
-  headerRow[0].textContent = 'Hero';
+  // Extract relevant content from input element
+  const headerRow = ['Hero'];
 
-  const cells = [headerRow];
+  // Prepare cells for the rows
+  const cells = [
+    [headerRow],
+    [
+      (() => {
+        const blockContainer = document.createElement('div');
 
-  Array.from(element.querySelectorAll('.elementor-widget-flip-box')).forEach((widget) => {
-    const front = widget.querySelector('.elementor-flip-box__front');
-    const back = widget.querySelector('.elementor-flip-box__back');
+        // Optional background image
+        const backgroundImage = element.querySelector('img');
+        if (backgroundImage) {
+          const image = document.createElement('img');
+          image.src = backgroundImage.dataset.lazySrc || backgroundImage.src;
+          blockContainer.appendChild(image);
+        }
 
-    // Extract image dynamically
-    let image = front.querySelector('img');
-    if (image) {
-      const imgElement = document.createElement('img');
-      imgElement.src = image.dataset.lazySrc || image.src;
-      imgElement.alt = image.alt;
-      image = imgElement;
-    }
+        // Mandatory title / heading
+        const titleElement = element.querySelector('.elementor-flip-box__layer__overlay h1, .elementor-flip-box__layer__overlay h2');
+        if (titleElement) {
+          const heading = document.createElement('h1');
+          heading.textContent = titleElement.textContent.trim();
+          blockContainer.appendChild(heading);
+        }
 
-    // Extract heading
-    const heading = back.querySelector('.elementor-flip-box__layer__description');
-    const headingElement = heading ? document.createElement('h1') : null;
-    if (headingElement) {
-      headingElement.textContent = heading.textContent.trim();
-    }
+        // Optional subheading or description
+        const descriptionElement = element.querySelector('.elementor-flip-box__layer__description');
+        if (descriptionElement) {
+          const description = document.createElement('p');
+          description.textContent = descriptionElement.textContent.trim();
+          blockContainer.appendChild(description);
+        }
 
-    // Extract call-to-action link
-    const cta = back.querySelector('a');
-    const ctaElement = cta ? document.createElement('a') : null;
-    if (ctaElement) {
-      ctaElement.href = cta.href;
-      ctaElement.textContent = cta.textContent.trim();
-    }
+        // Optional call-to-action
+        const ctaElement = element.querySelector('a');
+        if (ctaElement) {
+          const cta = document.createElement('a');
+          cta.href = ctaElement.href;
+          cta.textContent = ctaElement.textContent.trim();
+          blockContainer.appendChild(cta);
+        }
 
-    const content = [];
-    if (image) content.push(image);
-    if (headingElement) content.push(headingElement);
-    if (ctaElement) content.push(ctaElement);
+        return blockContainer;
+      })(),
+    ],
+  ];
 
-    cells.push([content]);
-  });
-
+  // Create the block
   const block = WebImporter.DOMUtils.createTable(cells, document);
+
+  // Replace the original element with the new structured block
   element.replaceWith(block);
 }

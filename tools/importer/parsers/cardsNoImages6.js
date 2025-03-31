@@ -1,50 +1,46 @@
+/* global WebImporter */
+
 export default function parse(element, { document }) {
-  // Correcting header row: Must match the example exactly
   const headerRow = ['Cards (no images)'];
 
-  // Extracting unique card data dynamically
-  const seenTitles = new Set();
-  const cards = [...element.querySelectorAll('.elementor-post')]
-    .filter(post => {
-      const title = post.querySelector('.elementor-post__title a')?.textContent.trim();
-      // Skip duplicate titles
-      if (title && seenTitles.has(title)) {
-        return false;
-      }
-      seenTitles.add(title);
-      return true;
-    })
-    .map(post => {
-      // Fetching card title (if available)
-      const title = post.querySelector('.elementor-post__title a')?.textContent.trim() || '';
+  const rows = [];
 
-      // Fetching description (if present)
-      const description = post.querySelector('.elementor-post__excerpt p')?.textContent.trim() || '';
+  // Extract cards content
+  const articleElements = element.querySelectorAll('.elementor-posts-container .elementor-post');
+  const uniqueTitles = new Set(); // To track unique titles
 
-      // Creating card rows with proper HTML elements dynamically
-      const content = [];
+  articleElements.forEach((article) => {
+    const contentContainer = []; // Container for cell content
 
-      if (title) {
+    // Extract title
+    const titleElement = article.querySelector('.elementor-post__title a');
+    if (titleElement) {
+      const titleText = titleElement.textContent.trim();
+      if (!uniqueTitles.has(titleText)) {
+        uniqueTitles.add(titleText); // Avoid duplicating entries
+
         const heading = document.createElement('h3');
-        heading.textContent = title;
-        content.push(heading);
+        heading.textContent = titleText;
+        contentContainer.push(heading);
+
+        // Extract description
+        const descriptionElement = article.querySelector('.elementor-post__excerpt p');
+        if (descriptionElement) {
+          const description = document.createElement('p');
+          description.textContent = descriptionElement.textContent.trim();
+          contentContainer.push(description);
+        }
+
+        // Add extracted content to table rows
+        rows.push([contentContainer]);
       }
+    }
+  });
 
-      if (description) {
-        const desc = document.createElement('p');
-        desc.textContent = description;
-        content.push(desc);
-      }
+  // Create the table block
+  const tableData = [headerRow, ...rows];
+  const blockTable = WebImporter.DOMUtils.createTable(tableData, document);
 
-      return [content];
-    });
-
-  // Combine header row and card rows
-  const tableData = [headerRow, ...cards];
-
-  // Create the table block dynamically using WebImporter helper method
-  const table = WebImporter.DOMUtils.createTable(tableData, document);
-
-  // Replace original element with the new structured table block
-  element.replaceWith(table);
+  // Replace the original element with the new block
+  element.replaceWith(blockTable);
 }

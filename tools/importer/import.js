@@ -9,8 +9,8 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-/* global window, WebImporter, XPathResult */
-/* eslint-disable no-console */
+/* global WebImporter */
+/* eslint-disable no-console, max-len */
 import metadataParser from './parsers/metadata.js';
 import embed1Parser from './parsers/embed1.js';
 import hero2Parser from './parsers/hero2.js';
@@ -64,6 +64,57 @@ import {
 } from './import.utils.js';
 import importRules from './import-rules.js';
 
+const parsers = {
+  metadata: metadataParser,
+  embed1: embed1Parser,
+  hero2: hero2Parser,
+  hero3: hero3Parser,
+  hero4: hero4Parser,
+  hero5: hero5Parser,
+  cardsNoImages6: cardsNoImages6Parser,
+  cards7: cards7Parser,
+  hero8: hero8Parser,
+  hero9: hero9Parser,
+  video10: video10Parser,
+  hero11: hero11Parser,
+  hero12: hero12Parser,
+  hero13: hero13Parser,
+  hero14: hero14Parser,
+  embed15: embed15Parser,
+  embed16: embed16Parser,
+  hero17: hero17Parser,
+  hero19: hero19Parser,
+  tableStripedBordered20: tableStripedBordered20Parser,
+  hero21: hero21Parser,
+  columns22: columns22Parser,
+  hero23: hero23Parser,
+  embed25: embed25Parser,
+  embed26: embed26Parser,
+  embed27: embed27Parser,
+  hero28: hero28Parser,
+  cards29: cards29Parser,
+  hero30: hero30Parser,
+  columns31: columns31Parser,
+  hero32: hero32Parser,
+  cardsNoImages33: cardsNoImages33Parser,
+  cards34: cards34Parser,
+  columns35: columns35Parser,
+  tableNoHeader36: tableNoHeader36Parser,
+  hero37: hero37Parser,
+  cards38: cards38Parser,
+  hero40: hero40Parser,
+  hero41: hero41Parser,
+  tableStripedBordered42: tableStripedBordered42Parser,
+  hero43: hero43Parser,
+  hero44: hero44Parser,
+  columns45: columns45Parser,
+  embed46: embed46Parser,
+};
+
+const transformers = {
+
+};
+
 WebImporter.Import = {
   getElementByXPath: (document, xpath) => {
     const result = document.evaluate(
@@ -75,69 +126,18 @@ WebImporter.Import = {
     );
     return result.singleNodeValue;
   },
-  getFragmentXPaths: (fragments = [], url) => fragments.flatMap(({ instances = [] }) => instances)
+  getFragmentXPaths: (fragments = [], url = '') => (fragments.flatMap(({ instances = [] }) => instances)
     .filter((instance) => instance.url === url)
-    .map(({ xpath }) => xpath),
-  findBlockRule: (rules, block) => {
-    return rules.blocks.find(({ params: { name, cluster }}) => {
-      return block.name === name && block.cluster === cluster;
-    });
-  },
+    .map(({ xpath }) => xpath)),
+  findBlockRule: (rules, block) => (
+    rules.blocks.find(({ params: { name, cluster } }) => (
+      block.name === name && block.cluster === cluster
+    ))
+  ),
   getBlockParser: ({ type, params: { id } = {} } = {}) => {
     const parserName = id || type;
     return parsers[parserName];
-  }
-};
-
-const parsers = {
-metadata: metadataParser,
-embed1: embed1Parser,
-hero2: hero2Parser,
-hero3: hero3Parser,
-hero4: hero4Parser,
-hero5: hero5Parser,
-cardsNoImages6: cardsNoImages6Parser,
-cards7: cards7Parser,
-hero8: hero8Parser,
-hero9: hero9Parser,
-video10: video10Parser,
-hero11: hero11Parser,
-hero12: hero12Parser,
-hero13: hero13Parser,
-hero14: hero14Parser,
-embed15: embed15Parser,
-embed16: embed16Parser,
-hero17: hero17Parser,
-hero19: hero19Parser,
-tableStripedBordered20: tableStripedBordered20Parser,
-hero21: hero21Parser,
-columns22: columns22Parser,
-hero23: hero23Parser,
-embed25: embed25Parser,
-embed26: embed26Parser,
-embed27: embed27Parser,
-hero28: hero28Parser,
-cards29: cards29Parser,
-hero30: hero30Parser,
-columns31: columns31Parser,
-hero32: hero32Parser,
-cardsNoImages33: cardsNoImages33Parser,
-cards34: cards34Parser,
-columns35: columns35Parser,
-tableNoHeader36: tableNoHeader36Parser,
-hero37: hero37Parser,
-cards38: cards38Parser,
-hero40: hero40Parser,
-hero41: hero41Parser,
-tableStripedBordered42: tableStripedBordered42Parser,
-hero43: hero43Parser,
-hero44: hero44Parser,
-columns45: columns45Parser,
-embed46: embed46Parser,
-};
-
-const transformers = {
-
+  },
 };
 
 /**
@@ -173,7 +173,7 @@ function transformPage(main, { inventory, ...source }) {
     const instancesForUrl = instances.filter((instance) => instance.url === originalURL);
     let elements = [main];
     if (instancesForUrl.length > 0) {
-      elements = instancesForUrl.map(({xpath}) => WebImporter.Import.getElementByXPath(document, xpath));
+      elements = instancesForUrl.map(({ xpath }) => WebImporter.Import.getElementByXPath(document, xpath));
     } else if (selectors.length > 0) {
       elements = selectors.reduce((acc, selector) => [...acc, ...main.querySelectorAll(selector)], []);
     }
@@ -190,7 +190,7 @@ function transformPage(main, { inventory, ...source }) {
   });
 
   // perform any additional transformations
-  Object.entries(transformers).forEach(([,transformerFn]) => transformerFn.call(this, main, source));
+  Object.entries(transformers).forEach(([, transformerFn]) => transformerFn.call(this, main, source));
 
   // remove fragment elements from the current page
   fragmentElements.forEach((element) => {
@@ -205,17 +205,17 @@ function transformPage(main, { inventory, ...source }) {
  */
 function transformFragment(main, { fragment, inventory, ...source }) {
   const { document, params: { originalURL } } = source;
-  const { instances = [] } = fragment;
+  const { instances: fragmentInstances = [] } = fragment;
 
   if (fragment.name === 'nav') {
     const navEl = document.createElement('div');
 
     // get number of blocks in the nav fragment
-    const navBlocks = Math.floor(instances.length / instances.filter((ins) => ins.uuid.includes('-00-')).length);
+    const navBlocks = Math.floor(fragmentInstances.length / fragmentInstances.filter((ins) => ins.uuid.includes('-00-')).length);
     console.log('navBlocks', navBlocks);
 
     for (let i = 0; i < navBlocks; i += 1) {
-      const { xpath } = instances[i] || {};
+      const { xpath } = fragmentInstances[i] || {};
       const el = WebImporter.Import.getElementByXPath(document, xpath);
       if (!el) {
         console.warn(`Failed to get element for xpath: ${xpath}`);
@@ -238,7 +238,8 @@ function transformFragment(main, { fragment, inventory, ...source }) {
     }
   } else {
     const { blocks = [] } = inventory || {};
-    instances.filter(({ url }) => `${url}?frag=${fragment.name}` === originalURL)
+    fragmentInstances
+      .filter(({ url }) => `${url}?frag=${fragment.name}` === originalURL)
       .map(({ xpath }) => ({
         xpath,
         element: WebImporter.Import.getElementByXPath(document, xpath),

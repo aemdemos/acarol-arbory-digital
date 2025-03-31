@@ -1,36 +1,24 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  const headerCell = document.createElement('strong');
-  headerCell.textContent = 'Embed';
-  
-  const headerRow = [headerCell];
+    // Extracting the relevant pieces dynamically
+    const headerRow = ['Embed'];
+    const imageElement = document.createElement('img');
+    const playerElement = element.querySelector('.castos-player .player__artwork img');
+    const embedLink = element.querySelector('.castos-player audio source')?.src || '';
+    
+    // Ensure valid dynamic content exists
+    if (playerElement) {
+        imageElement.src = playerElement?.getAttribute('data-lazy-src') || playerElement?.src;
+        imageElement.alt = playerElement?.alt || '';
+        imageElement.title = playerElement?.title || '';
+    }
 
-  // Extract the image URL and create an img element
-  const imgContainer = element.querySelector('.player__artwork img');
-  const imgSrc = imgContainer ? imgContainer.getAttribute('data-lazy-src') || imgContainer.getAttribute('src') : '';
-  const imageElement = imgSrc ? document.createElement('img') : null;
-  if (imageElement) {
-    imageElement.src = imgSrc;
-    imageElement.alt = imgContainer ? imgContainer.alt : '';
-    imageElement.title = imgContainer ? imgContainer.title : '';
-  }
+    const cells = [
+      [headerRow],
+      [[imageElement, embedLink]]
+    ];
+    const block = WebImporter.DOMUtils.createTable(cells, document);
 
-  // Extract the URL from the audio source
-  const audioElement = element.querySelector('audio.clip source');
-  const embedUrl = audioElement ? audioElement.src : '';
-
-  const urlElement = embedUrl ? document.createElement('a') : null;
-  if (urlElement) {
-    urlElement.href = embedUrl;
-    urlElement.textContent = embedUrl;
-  }
-
-  // Construct the rows for the table
-  const rows = [
-    headerRow,
-    [imageElement ? [imageElement, document.createElement('br'), urlElement] : urlElement]
-  ];
-
-  // Create the table block and replace the original element
-  const block = WebImporter.DOMUtils.createTable(rows, document);
-  element.replaceWith(block);
+    // Replace the original element
+    element.replaceWith(block);
 }

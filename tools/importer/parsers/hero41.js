@@ -1,32 +1,58 @@
+/* global WebImporter */
 export default function parse(element, { document }) {
-  // Table header row
+  // Create helper table function
+  const createTable = WebImporter.DOMUtils.createTable;
+
+  // Validate element
+  if (!element) return;
+
+  // Step-by-step extraction:
+
+  // Extract image dynamically
+  const imageElement = element.querySelector('.elementor-widget-image img');
+  const image = document.createElement('img');
+  if (imageElement) {
+    image.src = imageElement.src;
+    image.alt = imageElement.alt || ''; // extracting alt, fallback to empty
+  }
+
+  // Extract title dynamically
+  const titleElement = element.querySelector('.elementor-widget-heading .elementor-heading-title');
+  const title = document.createElement('h1');
+  if (titleElement) {
+    title.textContent = titleElement.textContent.trim(); // ensure no redundant spaces
+  }
+
+  // Extract subheading dynamically (optional)
+  const subheadingElement = element.querySelector('.elementor-widget-text-editor p');
+  const subheading = document.createElement('p');
+  if (subheadingElement) {
+    subheading.textContent = subheadingElement.textContent.trim(); // ensure no redundant spaces
+  }
+
+  // Extract optional call-to-action (button with link)
+  const buttonElement = element.querySelector('.elementor-widget-button a');
+  const button = document.createElement('a');
+  if (buttonElement) {
+    button.href = buttonElement.href;
+    button.textContent = buttonElement.textContent.trim();
+  }
+
+  // Header row matches exactly
   const headerRow = ['Hero'];
 
-  // Extract elements required for content row
+  // Content row handling edge cases:
+  const contentRow = [
+    [image, title, subheading, button].filter(Boolean), // filter removes any empty elements
+  ];
 
-  // Extract Image
-  const imageElement = element.querySelector("img");
-  const backgroundImage = imageElement ? imageElement.cloneNode(true) : null;
+  // Creating the block table - 1 column and 2 rows
+  const cells = [
+    headerRow,
+    contentRow,
+  ];
+  const block = createTable(cells, document);
 
-  // Extract Title
-  const titleElement = element.querySelector("h2");
-  const title = titleElement ? titleElement.cloneNode(true) : null;
-
-  // Extract Subheading
-  const subheadingElement = element.querySelector(".elementor-widget-text-editor p");
-  const subheading = subheadingElement ? subheadingElement.cloneNode(true) : null;
-
-  // Extract Call-to-Action
-  const ctaElement = element.querySelector("a.elementor-button");
-  const cta = ctaElement ? ctaElement.cloneNode(true) : null;
-
-  // Combine and structure rows for table
-  const contentRow = [[backgroundImage, title, subheading, cta].filter(Boolean)];
-  const data = [headerRow, contentRow];
-
-  // Create block table using WebImporter.DOMUtils
-  const table = WebImporter.DOMUtils.createTable(data, document);
-
-  // Replace the original element with the new block table
-  element.replaceWith(table);
+  // Replace original element with the generated block
+  element.replaceWith(block);
 }
