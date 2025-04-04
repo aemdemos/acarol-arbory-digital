@@ -21,7 +21,9 @@ export default function parse(element, { document }) {
   const cells = [
     ['Embed'], // Header row
     [
-      imageElement ? [imageElement, document.createTextNode(audioSrc)] : document.createTextNode(audioSrc),
+      imageElement
+        ? [imageElement, document.createTextNode(audioSrc)]
+        : document.createTextNode(audioSrc),
     ],
   ];
 

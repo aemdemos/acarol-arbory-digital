@@ -13,7 +13,10 @@ export default function parse(element, { document }) {
   // Create the new table structure
   const headerRow = ['Embed'];
   const contentRow = [
-    [iconWrapper.cloneNode(true), heading.cloneNode(true)], // Clone the elements to preserve their structure
+    [
+      iconWrapper.cloneNode(true),
+      heading.cloneNode(true),
+    ], // Clone the elements to preserve their structure
   ];
 
   const tableData = [headerRow, contentRow];

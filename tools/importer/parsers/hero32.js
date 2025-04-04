@@ -48,7 +48,7 @@ export default function parse(element, { document }) {
       headingElement,
       subheadingElement,
       ctaLink,
-    ].filter((item) => item); // Removes any null or undefined items
+    ].filter((el) => el); // Removes any null or undefined items
   });
 
   // Creating the table cells with header row and valid content rows

@@ -35,21 +35,21 @@ export default function parse(element, { document }) {
   }
 
   if (title) {
-    const titleElement = document.createElement('h1');
-    titleElement.textContent = title;
-    contentRow.push(titleElement);
+    const titleNode = document.createElement('h1');
+    titleNode.textContent = title;
+    contentRow.push(titleNode);
   }
 
   if (subHeading) {
-    const subHeadingElement = document.createElement('h2');
-    subHeadingElement.textContent = subHeading;
-    contentRow.push(subHeadingElement);
+    const subHeadingNode = document.createElement('h2');
+    subHeadingNode.textContent = subHeading;
+    contentRow.push(subHeadingNode);
   }
 
   if (bodyText) {
-    const bodyTextElement = document.createElement('p');
-    bodyTextElement.textContent = bodyText;
-    contentRow.push(bodyTextElement);
+    const bodyTextNode = document.createElement('p');
+    bodyTextNode.textContent = bodyText;
+    contentRow.push(bodyTextNode);
   }
 
   if (ctaLink && ctaText) {

@@ -13,10 +13,10 @@ export default function parse(element, { document }) {
   let backgroundImg;
   if (backgroundImgDiv) {
     const style = backgroundImgDiv.getAttribute('style');
-    const matches = style && style.match(/url\((['"]?)(.*?)\1\)/);
-    if (matches && matches[2]) {
+    const [, , url] = style?.match(/url\((['"]?)(.*?)\1\)/) || [];
+    if (url) {
       const img = document.createElement('img');
-      img.src = matches[2];
+      img.src = url;
       backgroundImg = img;
     }
   }
