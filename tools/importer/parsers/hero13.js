@@ -11,7 +11,7 @@ export default function parse(element, { document }) {
   const navElement = element.querySelector('.elementor-nav-menu');
   const navLinks = [];
   if (navElement) {
-    Array.from(navElement.querySelectorAll('li > a')).forEach(link => {
+    Array.from(navElement.querySelectorAll('li > a')).forEach((link) => {
       const navLink = document.createElement('a');
       navLink.href = link.href;
       navLink.textContent = link.textContent.trim();

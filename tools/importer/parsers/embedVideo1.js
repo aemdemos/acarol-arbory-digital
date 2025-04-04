@@ -20,7 +20,7 @@ export default function parse(element, { document }) {
   // Create table rows dynamically
   const cells = [
     [header],
-    [[image, document.createElement('br'), link]]
+    [[image, document.createElement('br'), link]],
   ];
 
   // Replace the original element with the new block table

@@ -24,7 +24,7 @@ export default function parse(element, { document }) {
   // Build the table array dynamically
   const cells = [
     ['Embed'], // Header row matches the example exactly
-    ...contentRows // Content rows extracted dynamically
+    ...contentRows, // Content rows extracted dynamically
   ];
 
   // Create the block table

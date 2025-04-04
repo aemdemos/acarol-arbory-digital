@@ -30,8 +30,8 @@ export default function parse(element, { document }) {
 
   // Table structure
   const cells = [
-    headerRow,          // Header row (only one column)
-    contentRow          // Content row (only one column with combined content)
+    headerRow, // Header row (only one column)
+    contentRow, // Content row (only one column with combined content)
   ];
 
   // Create table block

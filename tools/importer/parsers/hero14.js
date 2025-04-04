@@ -37,7 +37,7 @@ export default function parse(element, { document }) {
 
   const cells = [
     headerRow,
-    [contentRow]
+    [contentRow],
   ];
 
   // Create the table

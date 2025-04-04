@@ -7,13 +7,13 @@ export default function parse(element, { document }) {
   const timelineItems = element.querySelectorAll('.jet-hor-timeline-item');
 
   // Filter timeline items to exclude invalid entries
-  const validTimelineItems = Array.from(timelineItems).filter(item => {
+  const validTimelineItems = Array.from(timelineItems).filter((item) => {
     const heading = item.querySelector('.jet-hor-timeline-item__card-title');
     return heading && heading.textContent.trim(); // Ensure the item has a valid heading
   });
 
   // Step 3: Map over valid timeline items and extract content dynamically
-  const contentRows = validTimelineItems.map(item => {
+  const contentRows = validTimelineItems.map((item) => {
     // Extract image dynamically
     const imgElement = item.querySelector('.jet-hor-timeline-item__card-img img');
     const backgroundImg = imgElement ? imgElement.getAttribute('data-lazy-src') || imgElement.src : null;
@@ -47,14 +47,14 @@ export default function parse(element, { document }) {
       backgroundImgElement,
       headingElement,
       subheadingElement,
-      ctaLink
-    ].filter(item => item); // Removes any null or undefined items
+      ctaLink,
+    ].filter((item) => item); // Removes any null or undefined items
   });
 
   // Creating the table cells with header row and valid content rows
   const cells = [
     headerRow,
-    ...contentRows
+    ...contentRows,
   ];
 
   // Create the block table

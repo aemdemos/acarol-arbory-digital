@@ -39,7 +39,7 @@ export default function parse(element, { document }) {
   // Define table structure
   const cells = [
     ['Hero'], // Header row matching the example
-    [cellContent] // Content row with all extracted elements
+    [cellContent], // Content row with all extracted elements
   ];
 
   // Create block table using helper function

@@ -12,7 +12,7 @@ export default function parse(element, { document }) {
 
   // Combine list items into a single container
   const listContainer = document.createElement('div');
-  listItems.forEach(item => listContainer.appendChild(item));
+  listItems.forEach((item) => listContainer.appendChild(item));
 
   // Extract the call-to-action button
   const button = element.querySelector('.elementor-button');
@@ -21,7 +21,7 @@ export default function parse(element, { document }) {
   const headerRow = ['Hero'];
 
   const contentRow = [
-    [heading, paragraph, listContainer, button]
+    [heading, paragraph, listContainer, button],
   ];
 
   const cells = [headerRow, contentRow];

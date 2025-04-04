@@ -1,8 +1,8 @@
 /* global WebImporter */
 export default function parse(element, { document }) {
   // Extract dynamic content from the element
-  const imageSrc = element.querySelector('.player__artwork img')?.getAttribute('data-lazy-src') || 
-                   element.querySelector('.player__artwork img')?.src;
+  const imageSrc = element.querySelector('.player__artwork img')?.getAttribute('data-lazy-src')
+                   || element.querySelector('.player__artwork img')?.src;
   const audioSrc = element.querySelector('audio source')?.src;
 
   if (!audioSrc) {
@@ -21,8 +21,8 @@ export default function parse(element, { document }) {
   const cells = [
     ['Embed'], // Header row
     [
-      imageElement ? [imageElement, document.createTextNode(audioSrc)] : document.createTextNode(audioSrc)
-    ]
+      imageElement ? [imageElement, document.createTextNode(audioSrc)] : document.createTextNode(audioSrc),
+    ],
   ];
 
   // Create block table

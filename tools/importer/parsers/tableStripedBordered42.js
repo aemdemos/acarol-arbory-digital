@@ -2,7 +2,7 @@
 export default function parse(element, { document }) {
   // Extract relevant content
   const slides = Array.from(element.querySelectorAll('.swiper-slide a'));
-  const slideData = slides.map(slide => {
+  const slideData = slides.map((slide) => {
     const title = slide.getAttribute('data-elementor-lightbox-title') || 'Unknown Title';
     const url = slide.getAttribute('href') || 'Unknown URL';
     return [title, url];

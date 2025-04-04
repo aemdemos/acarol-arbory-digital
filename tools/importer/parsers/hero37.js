@@ -24,7 +24,7 @@ export default function parse(element, { document }) {
   // Create the table structure matching the example
   const cells = [
     ['Hero'], // Header row, exactly matching the example
-    [[image, heading]] // Combine image and heading into one cell in the content row
+    [[image, heading]], // Combine image and heading into one cell in the content row
   ];
 
   const block = WebImporter.DOMUtils.createTable(cells, document);
